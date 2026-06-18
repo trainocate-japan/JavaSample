@@ -94,10 +94,28 @@ curl http://localhost/health
 
 ---
 
-## AMI 作成後の注意
+## 接続成功例
 
-AMI を作って ASG で起動する場合、起動時にアプリが自動起動するよう systemd サービスを登録しておくと便利です。  
-またはユーザーデータで手順6のコマンドを実行させる方法もあります。
+![接続成功画面](images/success.png)
+
+---
+
+## AMI 作成後：ユーザーデータによる自動起動
+
+AMI を作成し ASG の起動テンプレートに設定する際、以下をユーザーデータに記述するとインスタンス起動時にアプリが自動起動します。
+
+RDS接続情報の3箇所を自分の環境に合わせて書き換えてください。
+
+```bash
+#!/bin/bash
+sudo java -jar /home/ec2-user/sample-app/target/demo-1.0.0.jar \
+  --spring.datasource.url='jdbc:mysql://your-rds-endpoint.rds.amazonaws.com:3306/?useSSL=false&allowPublicKeyRetrieval=true' \
+  --spring.datasource.username='admin' \
+  --spring.datasource.password='your-password' \
+  > /home/ec2-user/app.log 2>&1 &
+```
+
+> **注意**: ユーザーデータは root で実行されるため `sudo` は省略可能ですが、付けても問題ありません。
 
 ## ALB ヘルスチェック設定
 
